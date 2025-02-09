@@ -1,0 +1,39 @@
+# Ignore Python cache & compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environments
+venv/
+.env/
+.venv/
+*.env
+*.venv
+
+# Ignore Jupyter Notebook checkpoints (if using Jupyter)
+.ipynb_checkpoints/
+
+# Ignore log & output files
+logs/
+*.log
+debug.log
+
+# Ignore configuration files with secrets
+.streamlit/secrets.toml  # Contains API keys & passcodes
+config.yaml
+
+# Ignore IDE & Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore Streamlit cache
+~/.streamlit/
+.cache/
+.history/
+.db/
+
+# Ignore Hugging Face cache (if used)
+~/.cache/huggingface/
