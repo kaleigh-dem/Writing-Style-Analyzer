@@ -6,6 +6,7 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     install_requires=[
+        "numpy",
         "streamlit",
         "torch",
         "transformers",
@@ -22,7 +23,7 @@ setup(
     description="An AI-powered tool for analyzing and generating writing styles.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/yourgithub/Writing_Style_Analyzer",
+    url="https://github.com/kaleigh-dem/Writing-Style-Analyzer",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

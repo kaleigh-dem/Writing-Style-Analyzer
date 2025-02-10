@@ -21,7 +21,7 @@ Analyze and Generate Text in the Style of Famous Authors
 
 ## 🌟 Demo
 
-[🔗 Live Web App (Streamlit)](https://your-streamlit-app-link)
+[🔗 Live Web App (Streamlit)](https://writing-style-analyzer.streamlit.app/)
 
 ---
 
@@ -88,7 +88,7 @@ streamlit run app.py
 
 ### 1️⃣ Prepare Dataset
 
-Modify training/gutenberg_dataset_chunks.csv or use your own dataset with:
+Generate a dataset using training/get_training_data.py or use your own dataset with:
 
 - Columns: text, author
 
@@ -118,4 +118,5 @@ MODEL_PATH = "models/Trained_Roberta_new.pth"
 
 ## 📜 License  
 
-This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.  
+This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.
+
