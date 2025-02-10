@@ -1,9 +1,9 @@
-streamlit==1.25.0
-torch==2.2.0
-transformers==4.33.0
-pandas==2.0.3
 numpy==1.23.5
-openai==0.27.8
-tokenizers==0.13.3
-setuptools>=65.5.0
+torch
+transformers
+streamlit
+pandas
+openai
+tokenizers
+setuptools
 wheel
