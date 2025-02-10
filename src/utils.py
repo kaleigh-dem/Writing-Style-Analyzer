@@ -51,11 +51,11 @@ def generate_weighted_text(prompt, author_probabilities, topic, use_personal_sty
             "Please follow these steps:"
             "1. **Identify less than 10 defining features** of the blended style strictly from these top authors."
             "   - Provide these as a concise, comma-separated list."
-            f"   - Ensure the percentages match exactly with those in {style_weights} (e.g., Doyle (98.36%))."
+            f"   - Ensure the percentages match exactly with those in {style_weights}."
             "   - Emphasize the influences in proportion to their weights (higher-weighted authors have a stronger impact)."
             "2. **Generate a ~200-word passage** that uses only the identified authors’ styles."
             f"   - Retain the proportions specified by {style_weights}."
-            "   - If the user has provided a snippet, continue its context or tone naturally."
+             "  - Ignore the passage example provided by the user"
             "3. **Explain in 3–4 sentences** how the passage reflects these specific author influences and their numeric weights."
             "   - Keep this explanation concise (100 words or fewer)."
             "4. **Output all information** as a valid JSON object with the following structure:"
@@ -76,7 +76,7 @@ def generate_weighted_text(prompt, author_probabilities, topic, use_personal_sty
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Here is a passage example:{prompt}Write a passage about {topic} "}
+                {"role": "user", "content": f"Here is a passage example:{prompt} Write a passage about {topic} "}
             ],
             temperature=0.7,
             max_tokens=MAX_GENERATED_TOKENS,

@@ -6,7 +6,7 @@
 
 Analyze and Generate Text in the Style of Famous Authors  
 
-🚀 A **Streamlit-powered web app** that leverages **RoBERTa** for **style analysis and text generation**, trained on a diverse set of authors.
+🚀 A Streamlit-powered web app that leverages RoBERTa for style analysis and text generation, trained on the works of 20 classic authors including Jane Austen, Oscar Wilde, Mary Shelley, Charles Dickens, and Fyodor Dostoevsky.
 
 ---
 
@@ -109,6 +109,33 @@ Modify:
 ```bash
 MODEL_PATH = "models/Trained_Roberta_new.pth"
 ```
+## 📚 Training Data
+The model was trained on passages from the following **20 authors**, using books from Project Gutenberg:
+
+| Author               | Book Title                         |
+|----------------------|----------------------------------|
+| **Jane Austen**      | *Pride and Prejudice*           |
+| **Herman Melville**  | *Moby Dick*                     |
+| **Charles Dickens**  | *Great Expectations*           |
+| **Oscar Wilde**      | *The Picture of Dorian Gray*   |
+| **Fyodor Dostoevsky** | *Crime and Punishment*         |
+| **Arthur Conan Doyle** | *The Adventures of Sherlock Holmes* |
+| **Jack London**      | *The Call of the Wild*         |
+| **Joseph Conrad**    | *Heart of Darkness*            |
+| **Bram Stoker**      | *Dracula*                       |
+| **Mary Shelley**     | *Frankenstein*                 |
+| **Nathaniel Hawthorne** | *The Scarlet Letter*        |
+| **Alexandre Dumas**  | *The Count of Monte Cristo*    |
+| **Victor Hugo**      | *Les Misérables*               |
+| **Leo Tolstoy**      | *Anna Karenina*                |
+| **Charlotte Brontë** | *Jane Eyre*                    |
+| **Emily Brontë**     | *Wuthering Heights*            |
+| **H.G. Wells**       | *The Time Machine*             |
+| **Edith Wharton**    | *The House of Mirth*           |
+| **Thomas Hardy**     | *Tess of the d'Urbervilles*    |
+| **Henry James**      | *The Turn of the Screw*, *Daisy Miller* |
+
+These books were sourced from [Project Gutenberg](https://www.gutenberg.org/) and cleaned before training.
 
 ## 🔒 Security & Deployment  
 
