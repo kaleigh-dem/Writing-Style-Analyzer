@@ -1,7 +1,7 @@
 import streamlit as st
 from model import classify_text
 from utils import generate_weighted_text
-from config import MAX_INPUT_TOKENS, PASSCODE
+from config import MAX_INPUT_TOKENS, PASSCODE, ENABLE_AUTH
 from style import custom_css
 import pandas as pd
 import json
@@ -17,26 +17,27 @@ st.set_page_config(
 # Apply custom styling
 st.markdown(custom_css(), unsafe_allow_html=True)
 
-# ---- 🔒 AUTHENTICATION ----
-if "authenticated" not in st.session_state:
-    st.session_state["authenticated"] = False
+# ---- 🔒 AUTHENTICATION (OPTIONAL) ----
+if ENABLE_AUTH:  # Check if authentication is enabled in config.py
+    if "authenticated" not in st.session_state:
+        st.session_state["authenticated"] = False
 
-if not st.session_state["authenticated"]:
-    st.subheader("🔒 Secure Access")
-    user_passcode = st.text_input("Enter Passcode:", type="password")
+    if not st.session_state["authenticated"]:
+        st.subheader("🔒 Secure Access")
+        user_passcode = st.text_input("Enter Passcode:", type="password")
 
-    if st.button("Submit Passcode"):
-        if "general" in st.secrets and "PASSCODE" in st.secrets["general"]:
-            if user_passcode == st.secrets["general"]["PASSCODE"]:
-                st.session_state["authenticated"] = True
-                st.success("✅ Access granted! Welcome to the Writing Style Analyzer.")
-                st.rerun()
+        if st.button("Submit Passcode"):
+            if "general" in st.secrets and "PASSCODE" in st.secrets["general"]:
+                if user_passcode == st.secrets["general"]["PASSCODE"]:
+                    st.session_state["authenticated"] = True
+                    st.success("✅ Access granted! Welcome to the Writing Style Analyzer.")
+                    st.rerun()
+                else:
+                    st.warning("⚠️ Incorrect passcode. Try again.")
+                    st.stop()
             else:
-                st.warning("⚠️ Incorrect passcode. Try again.")
+                st.error("⚠️ Passcode is not configured in Streamlit Secrets!")
                 st.stop()
-        else:
-            st.error("⚠️ Passcode is not configured in Streamlit Secrets!")
-            st.stop()
 
 # ---- 🚀 MAIN APP CONTENT (If Authenticated) ----
 if st.session_state["authenticated"]:

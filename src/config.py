@@ -5,6 +5,8 @@ import streamlit as st
 OPENAI_API_KEY = st.secrets["general"]["OPENAI_API_KEY"]
 PASSCODE = st.secrets["general"]["PASSCODE"]
 
+ENABLE_AUTH = False  # Set to False to disable authentication
+
 # Hugging Face model repository
 MODEL_NAME = "ksj3768/literary-roberta"
 
