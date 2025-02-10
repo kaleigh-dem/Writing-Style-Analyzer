@@ -17,30 +17,26 @@ st.set_page_config(
 # Apply custom styling
 st.markdown(custom_css(), unsafe_allow_html=True)
 
+# Initialize session state variables **before** using them
+if "authenticated" not in st.session_state:
+    st.session_state["authenticated"] = False  # Default to False
+
 # ---- 🔒 AUTHENTICATION (OPTIONAL) ----
-if ENABLE_AUTH:  # Check if authentication is enabled in config.py
-    if "authenticated" not in st.session_state:
-        st.session_state["authenticated"] = False
+if ENABLE_AUTH and not st.session_state["authenticated"]:  # Only enforce authentication if enabled
+    st.subheader("🔒 Secure Access")
+    user_passcode = st.text_input("Enter Passcode:", type="password")
 
-    if not st.session_state["authenticated"]:
-        st.subheader("🔒 Secure Access")
-        user_passcode = st.text_input("Enter Passcode:", type="password")
+    if st.button("Submit Passcode"):
+        if user_passcode == PASSCODE:
+            st.session_state["authenticated"] = True
+            st.success("✅ Access granted! Welcome to the Writing Style Analyzer.")
+            st.rerun()  # Refresh the app to apply authentication state
+        else:
+            st.warning("⚠️ Incorrect passcode. Try again.")
+            st.stop()  # Prevent unauthorized users from continuing
 
-        if st.button("Submit Passcode"):
-            if "general" in st.secrets and "PASSCODE" in st.secrets["general"]:
-                if user_passcode == st.secrets["general"]["PASSCODE"]:
-                    st.session_state["authenticated"] = True
-                    st.success("✅ Access granted! Welcome to the Writing Style Analyzer.")
-                    st.rerun()
-                else:
-                    st.warning("⚠️ Incorrect passcode. Try again.")
-                    st.stop()
-            else:
-                st.error("⚠️ Passcode is not configured in Streamlit Secrets!")
-                st.stop()
-
-# ---- 🚀 MAIN APP CONTENT (If Authenticated) ----
-if st.session_state["authenticated"]:
+# ---- 🚀 MAIN APP CONTENT ----
+if not ENABLE_AUTH or st.session_state["authenticated"]:  # Skip authentication if disabled
     st.title("📖 Writing Style Analyzer & Generator")
     st.write("Enter a passage, analyze its style, and generate text in the same blended style!")
 
@@ -50,17 +46,28 @@ if st.session_state["authenticated"]:
     )
     WORD_LIMIT = 300
 
-    # Ensure session state for input text
-    if "user_text" not in st.session_state:
-        st.session_state["user_text"] = DEFAULT_TEXT
-
-    # Word limit enforcement function
+   # Text input with live enforcement
     def enforce_word_limit():
         words = st.session_state["input_text"].split()
         if len(words) > WORD_LIMIT:
             st.session_state["input_text"] = " ".join(words[:WORD_LIMIT])  # Truncate extra words
 
-    # Text input with live enforcement
+        # Reset all stored results if the text changes
+        if "last_user_text" in st.session_state and st.session_state["last_user_text"] != st.session_state["input_text"]:
+            st.session_state.pop("author_probs", None)  # Clear style analysis
+            st.session_state.pop("generated_passage", None)  # Clear generated text
+            st.session_state.pop("style_elements", None)  # Clear style elements
+            st.session_state.pop("style_explanation", None)  # Clear explanation
+
+        # Store the updated text to track future changes
+        st.session_state["last_user_text"] = st.session_state["input_text"]
+
+    # Ensure session state for input text
+    if "user_text" not in st.session_state:
+        st.session_state["user_text"] = DEFAULT_TEXT
+    if "last_user_text" not in st.session_state:
+        st.session_state["last_user_text"] = DEFAULT_TEXT  # Store previous input
+
     user_text = st.text_area(
         "Enter your passage:",
         value=st.session_state["user_text"],  # Start with stored text
@@ -111,13 +118,24 @@ if st.session_state["authenticated"]:
         # Display as a table
         st.dataframe(top_5_df, hide_index=True)
 
-    # ---- ✍️ GENERATE TEXT ----
-    if "author_probs" in st.session_state and st.session_state["author_probs"]:
+        # ---- ✍️ GENERATE TEXT ----
+        if "selected_topic" not in st.session_state:
+            st.session_state["selected_topic"] = ""
+        if "custom_topic" not in st.session_state:
+            st.session_state["custom_topic"] = ""
+        if "use_personal_style" not in st.session_state:
+            st.session_state["use_personal_style"] = True  # Default value
+
         st.subheader("✍️ Generate a Passage in This Style")
 
-        # Allow user to include personal writing style
-        use_personal_style = st.toggle("Would you like to consider your personal writing style?")
-        st.session_state["use_personal_style"] = use_personal_style
+        # Personal style toggle
+        new_use_personal_style = st.toggle("Would you like to consider your personal writing style?", value=st.session_state["use_personal_style"])
+
+        # Reset results if toggle changes
+        if new_use_personal_style != st.session_state["use_personal_style"]:
+            for key in ["generated_passage", "style_elements", "style_explanation"]:
+                st.session_state.pop(key, None)  # Clear previous results
+            st.session_state["use_personal_style"] = new_use_personal_style  # Update state
 
         # Topic selection
         predefined_topics = [
@@ -131,13 +149,28 @@ if st.session_state["authenticated"]:
             "An artist and a spy find love through hidden messages in paintings.",
             "A cat steals a fish from a busy market stall."
         ]
+        
         selected_topic = st.selectbox("Choose a topic:", predefined_topics, index=0)
 
-        # Custom topic input
+        # Reset results if the selected topic changes
+        if st.session_state["selected_topic"] != selected_topic:
+            for key in ["generated_passage", "style_elements", "style_explanation"]:
+                st.session_state.pop(key, None)  # Clear previous results
+            st.session_state["selected_topic"] = selected_topic  # Update stored topic
+
+        # Handle custom topic input
         topic = st.text_area("Enter your custom topic:", "", height=100) if selected_topic == "Write Your Own..." else selected_topic
 
+        # Reset results if the custom topic changes
+        if st.session_state["custom_topic"] != topic:
+            for key in ["generated_passage", "style_elements", "style_explanation"]:
+                st.session_state.pop(key, None)  # Clear previous results
+            st.session_state["custom_topic"] = topic  # Update stored topic
+
         if st.button("Generate Text"):
-            if topic.strip():
+            if selected_topic == "Write Your Own..." and not topic.strip():
+                st.warning("⚠️ Please enter a topic before generating text.")
+            else:
                 with st.spinner("Generating..."):
                     try:
                         response = generate_weighted_text(
@@ -147,17 +180,7 @@ if st.session_state["authenticated"]:
                             st.session_state["use_personal_style"]
                         )
 
-                        # Convert response if it's a JSON string
-                        if isinstance(response, str):
-                            try:
-                                response_data = json.loads(response)
-                            except json.JSONDecodeError:
-                                response_data = {"generated_passage": response}  # Assume response is raw text
-
-                        elif isinstance(response, dict):
-                            response_data = response
-                        else:
-                            response_data = {"generated_passage": "⚠️ Unexpected response format"}
+                        response_data = response if isinstance(response, dict) else {"generated_passage": response}
 
                         st.session_state["generated_passage"] = response_data.get("generated_passage", "⚠️ No passage generated.")
                         st.session_state["style_elements"] = response_data.get("style_elements", "⚠️ No style elements found.")
@@ -165,6 +188,7 @@ if st.session_state["authenticated"]:
 
                     except Exception as e:
                         st.error(f"⚠️ AI generation error: {e}")
+
 
     # ---- 🎭 KEY STYLE ELEMENTS ----
     if "style_elements" in st.session_state and st.session_state["style_elements"]:
