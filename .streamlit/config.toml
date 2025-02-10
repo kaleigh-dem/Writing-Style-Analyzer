@@ -1,0 +1,3 @@
+[theme]
+primaryColor = "#7a52c7"  # Purple theme color for buttons, toggles, etc.
+font = "serif"  # Ensures a classic look (EB Garamond still applied via CSS)
